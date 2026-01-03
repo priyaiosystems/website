@@ -33,23 +33,28 @@ const Icons = {
     </svg>
   ),
   CheckCircle: () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e8555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', verticalAlign: 'text-bottom' }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', verticalAlign: 'text-bottom' }}>
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
       <polyline points="22 4 12 14.01 9 11.01"></polyline>
     </svg>
   ),
   Tool: () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00ADD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', verticalAlign: 'text-bottom' }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', verticalAlign: 'text-bottom' }}>
       <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
     </svg>
   ),
   Cloud: () => (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2e8555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+    </svg>
+  ),
+  CloudWhite: () => (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
     </svg>
   ),
   FileCheck: () => (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00ADD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
       <polyline points="14 2 14 8 20 8"></polyline>
       <path d="M9 15l2 2 4-4"></path>
@@ -73,10 +78,10 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
-        <h1 className="hero__title">The Enterprise Standard for AL3 Processing.</h1>
+        <h1 className="hero__title">The Enterprise Standard for Secure AL3 Processing.</h1>
         <p className="hero__subtitle">
-          Deploy a private, high-throughput AL3 parsing microservice in your own VPC.<br />
-          From real-time API requests to multi-GB batch migrations.
+          Zero Data Exfiltration. Real-time API & High-Throughput Batch Processing for
+          <br />Analytics & AI Workloads.
         </p>
 
         <div style={{ marginTop: '1.5rem', marginBottom: '2.5rem' }}>
@@ -95,17 +100,17 @@ function HomepageHeader() {
             gap: '8px'
           }}>
             <Icons.Shield />
-            Deployable on ECS, EKS, and Fargate
+            Deployable on AWS ECS, EKS, Fargate and other Cloud Platforms
           </span>
         </div>
 
         <div className={styles.buttons} style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link
             className="button button--primary button--lg"
-            style={{ background: '#fff', color: '#2e8555', border: 'none', minWidth: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            style={{ color: '#fff', border: 'none', minWidth: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             to="https://aws.amazon.com/marketplace">
-            <Icons.Cloud />
-            <span style={{ marginLeft: '5px' }}>View Container on AWS</span>
+            <Icons.CloudWhite />
+            <span style={{ marginLeft: '5px' }}>Deploy Private Container</span>
           </Link>
           <Link
             className="button button--secondary button--lg"
@@ -138,15 +143,15 @@ function ProductHierarchy() {
               overflow: 'hidden'
             }}>
               <div style={{
-                position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', background: '#2e8555'
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', background: 'linear-gradient(90deg, #10b981 0%, #34d399 100%)'
               }}></div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-                <div style={{ padding: '10px', background: '#e6fffa', borderRadius: '8px', color: '#2e8555' }}>
+                <div style={{ padding: '10px', background: '#ecfdf5', borderRadius: '8px', color: '#10b981' }}>
                   <Icons.Server />
                 </div>
-                <div style={{ textTransform: 'uppercase', fontSize: '0.85rem', fontWeight: '800', color: '#2e8555', letterSpacing: '0.5px' }}>
-                  Production Infrastructure
+                <div style={{ textTransform: 'uppercase', fontSize: '0.85rem', fontWeight: '800', color: '#10b981', letterSpacing: '0.5px' }}>
+                  Enterprise Processing Engine
                 </div>
               </div>
 
@@ -155,10 +160,10 @@ function ProductHierarchy() {
                 A dockerized, zero-dependency binary optimized for high-throughput server-side processing.
               </p>
               <ul style={{ listStyle: 'none', padding: 0, fontSize: '1.05rem', lineHeight: '2', color: '#2d3748' }}>
-                <li><Icons.CheckCircle /> <strong>Real-Time API:</strong> JSON-over-HTTP for instant policy creation.</li>
-                <li><Icons.CheckCircle /> <strong>Batch Mode:</strong> Process 10GB+ AL3 archives in minutes.</li>
-                <li><Icons.CheckCircle /> <strong>Private:</strong> Runs entirely within your firewall. No data egress.</li>
-                <li><Icons.CheckCircle /> <strong>Flat Pricing:</strong> No per-transaction fees.</li>
+                <li><Icons.CheckCircle /> <strong>Cloud Migration Ready:</strong> Ideal for moving on-prem workloads.</li>
+                <li><Icons.CheckCircle /> <strong>Multi-Format:</strong> JSON, CSV, Parquet for AI & Analytics.</li>
+                <li><Icons.CheckCircle /> <strong>High-Throughput:</strong> Process multi-GB archives in minutes.</li>
+                <li><Icons.CheckCircle /> <strong>Private:</strong> Zero Data Exfiltration. Runs entirely within your firewall.</li>
               </ul>
             </div>
           </div>
@@ -173,23 +178,24 @@ function ProductHierarchy() {
               background: '#fff',
               position: 'relative',
               transition: 'transform 0.2s ease',
+              overflow: 'hidden'
             }}>
               <div style={{
-                position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', background: '#00ADD8'
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', background: 'linear-gradient(90deg, #06b6d4 0%, #22d3ee 100%)'
               }}></div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-                <div style={{ padding: '10px', background: '#e0f7fa', borderRadius: '8px', color: '#00ADD8' }}>
+                <div style={{ padding: '10px', background: '#cffafe', borderRadius: '8px', color: '#06b6d4' }}>
                   <Icons.Code />
                 </div>
-                <div style={{ textTransform: 'uppercase', fontSize: '0.85rem', fontWeight: '800', color: '#00ADD8', letterSpacing: '0.5px' }}>
-                  Developer Tooling
+                <div style={{ textTransform: 'uppercase', fontSize: '0.85rem', fontWeight: '800', color: '#06b6d4', letterSpacing: '0.5px' }}>
+                  Developer Experience & Validation
                 </div>
               </div>
 
-              <Heading as="h2" style={{ fontSize: '2.2rem', marginBottom: '1rem', color: '#1a202c' }}>Integration Sandbox</Heading>
+              <Heading as="h2" style={{ fontSize: '2.2rem', marginBottom: '1rem', color: '#1a202c' }}>Integration Sandbox (Local-Only)</Heading>
               <p style={{ fontSize: '1.1rem', marginBottom: '2rem', color: '#4a5568', lineHeight: '1.6' }}>
-                A client-side utility to verify file integrity and debug parsing logic before integration.
+                Free forever. Client-side WASM verification. Zero data upload to server.
               </p>
               <ul style={{ listStyle: 'none', padding: 0, fontSize: '1.05rem', lineHeight: '2', color: '#2d3748' }}>
                 <li><Icons.Tool /> <strong>Visual Verification:</strong> See the JSON structure before you code.</li>
@@ -241,7 +247,7 @@ function Workflow() {
 
           <div className="col col--3" style={{ textAlign: 'center', padding: '1rem' }}>
             <div style={{ background: '#fff', width: '100px', height: '100px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2e8555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                 <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
                 <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
@@ -251,7 +257,7 @@ function Workflow() {
               </svg>
             </div>
             <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem' }}>3. Scale</h3>
-            <p style={{ color: '#4a5568' }}>Pipe your S3 buckets into the container for massive parallel processing in your VPC.</p>
+            <p style={{ color: '#4a5568' }}>Elastic scaling. Pipe your S3 buckets into the container for massive parallel processing in your VPC.</p>
           </div>
 
         </div>
@@ -266,14 +272,15 @@ function ComparisonTable() {
       <div className="container">
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <Heading as="h2" style={{ fontSize: '2.5rem' }}>Enterprise-Grade Performance</Heading>
-          <p style={{ fontSize: '1.2rem', color: '#718096' }}>Why leading engineering teams choose the GOAL3 Container.</p>
+          <p style={{ fontSize: '1.2rem', color: '#718096', marginBottom: '0.5rem' }}>Why leading engineering teams choose the GOAL3 Container.</p>
+          <p style={{ fontSize: '1rem', color: '#e53e3e', fontWeight: '600' }}>Stop paying $999/year/seat for legacy viewers.</p>
         </div>
         <div className="comparison-table-container">
           <table className="comparison-table">
             <thead>
               <tr>
                 <th>Feature</th>
-                <th className="product-column-free">Web Viewer (Free)</th>
+                <th className="product-column-free">GOAL3 Viewer (Free)</th>
                 <th className="product-column-pro">Enterprise Container (Commercial)</th>
               </tr>
             </thead>
@@ -304,7 +311,7 @@ function ComparisonTable() {
               <tr>
                 <td>Input Sources</td>
                 <td>Local Drag & Drop</td>
-                <td className="highlight-cell">S3, EFS, HTTP Stream, Local Disk</td>
+                <td className="highlight-cell">S3, Kafka, EFS, HTTP Stream, Local Disk</td>
               </tr>
               <tr>
                 <td>Customization</td>
@@ -319,8 +326,13 @@ function ComparisonTable() {
 
               <tr>
                 <td>Privacy</td>
-                <td>Local Memory Only</td>
+                <td>Browser (Client-Side) / Local-Only</td>
                 <td className="highlight-cell">VPC Internal (Zero Exfiltration)</td>
+              </tr>
+              <tr>
+                <td>Cost Model</td>
+                <td><strong>Free Forever</strong> (No license fees)</td>
+                <td className="highlight-cell">Pay-as-you-go</td>
               </tr>
             </tbody>
           </table>

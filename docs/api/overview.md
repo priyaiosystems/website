@@ -93,6 +93,7 @@ All formats include:
 - **Validation Summary**: Warnings and errors encountered
 
 [View detailed schema documentation →](./output-formats)
+- **JSON Schema**: [Download v1.0.0 Definition](pathname:///schemas/acord-al3-pc-v1.0.0.json)
 
 ## 🛠️ Error Handling
 

@@ -58,10 +58,10 @@ const config = {
         ({
             image: 'img/goal3-social-card.jpg',
             metadata: [
-                { name: 'keywords', content: 'ACORD AL3, insurance data parser, InsurTech, cloud analytics, enterprise insurance technology, AL3 to Parquet, AL3 to JSON, insurance data integration, policy data extraction, ACORD data conversion, insurance AI, insurance machine learning' },
-                { name: 'description', content: 'Enterprise ACORD AL3 Parser for cloud-ready analytics and AI workloads. Zero data exfiltration, pay-as-you-go pricing. Parse AL3 to JSON, CSV, or Parquet for modern data platforms.' },
+                { name: 'keywords', content: 'ACORD AL3, insurance data parser, InsurTech, cloud analytics, enterprise insurance technology, AL3 to Parquet, AL3 to JSON, insurance data integration, policy data extraction, ACORD data conversion, insurance AI, insurance machine learning, ETL, Data Lake, Policy Admin' },
+                { name: 'description', content: 'The Enterprise Standard for Secure ACORD AL3 Processing. Zero Data Exfiltration, Real-time API & High-Throughput Batch Processing. Free local viewer, pay-as-you-go container.' },
                 { property: 'og:image', content: 'https://priyaiosystems.com/img/goal3-social-card.jpg' },
-                { property: 'og:description', content: 'Enterprise ACORD AL3 Parser for cloud-ready analytics and AI workloads' },
+                { property: 'og:description', content: 'The Enterprise Standard for Secure ACORD AL3 Processing. Zero Data Exfiltration.' },
             ],
             // Color Mode Config
             colorMode: {
@@ -94,7 +94,7 @@ const config = {
                     },
                     {
                         to: '/viewer',
-                        label: 'Launch Viewer',
+                        label: 'GOAL3 Viewer',
                         position: 'right',
                         className: 'button button--primary button--sm navbar-cta-btn',
                     },
@@ -120,6 +120,10 @@ const config = {
                                 label: 'AL3 Spec Reference',
                                 to: '/docs/product/in_depth/al3_standard_variance',
                             },
+                            {
+                                label: 'JSON Schema (v1.0.0)',
+                                to: 'pathname:///schemas/acord-al3-pc-v1.0.0.json',
+                            },
                         ],
                     },
                     {
@@ -132,7 +136,7 @@ const config = {
                         ],
                     },
                 ],
-                copyright: `© ${new Date().getFullYear()} Priya IO Systems.`,
+                copyright: `© ${new Date().getFullYear()} Priya IO Systems`,
             },
             prism: {
                 theme: lightCodeTheme,
