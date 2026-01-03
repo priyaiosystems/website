@@ -1,0 +1,22 @@
+# GOAL3 Batch Processing Configuration
+
+# Source location (required)
+# Supports: s3://bucket/prefix, /path/to/files, ./relative/path
+source: s3://my-bucket/al3-files/
+
+# Output location (required)
+# Outputs will be written here
+output: s3://my-bucket/parsed/
+
+# Output format (optional, default: json)
+# Options: json, csv, parquet
+format: parquet
+
+# Number of parallel workers (optional, default: 4)
+# Range: 1-64
+# Higher values increase throughput but use more memory
+concurrency: 8
+
+# Resume from previous run (optional, default: true)
+# Skip files that have already been processed
+resume: true

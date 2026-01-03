@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOAL3 - Enterprise ACORD AL3 Viewer | Zero Data Exfiltration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #e9ecef;
+            height: 100vh;
+            /* Fixed height to prevent scroll */
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Hide body scroll, container handles internal scroll */
+        }
+
+        .container {
+            width: 100%;
+            /* Changed from max-width to width 100% for flex child */
+            max-width: 100%;
+            background: white;
+            border-radius: 8px;
+            /* Rounded all corners */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            /* Grow to fill remaining space */
+            overflow: hidden;
+            /* Internal scroll handled by content */
+            margin-bottom: 0;
+        }
+
+        .header {
+            padding: 4px 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            color: #212529;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 48px;
+            /* Slightly taller for stacked text */
+        }
+
+        /* ... existing styles ... */
+
+        loadWASM();
+
+        </script></body></html>.header-left {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 1.3em;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .header .version {
+            opacity: 0.7;
+            font-size: 0.85em;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-select-btn {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+
+        .file-select-btn:hover {
+            background: #5a6fd6;
+        }
+
+        .validation-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            font-weight: 600;
+            font-size: 0.85em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            /* Increased gap between parts */
+            transition: all 0.2s;
+            height: 28px;
+            background: transparent;
+            /* No background by default */
+            color: #333;
+            /* Neutral text color */
+        }
+
+        .validation-badge:hover {
+            background: #e9ecef;
+            /* Simple gray hover */
+            transform: translateY(-1px);
+        }
+
+        /* Semantic classes only used for modal or specific text bits if needed,
+           but badge container itself is neutral now as it can contain both */
+        .validation-badge.success {
+            color: #28a745;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .filename-display {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #495057;
+            display: none;
+            /* Hidden until file selected */
+        }
+
+        .drag-active {
+            background: #e9ecef !important;
+            outline: 2px dashed #667eea;
+            outline-offset: -2px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .content {
+            flex: 1;
+            overflow: hidden;
+            display: block;
+            /* Always visible to maintain layout */
+        }
+
+        .panes {
+            display: flex;
+            height: 100%;
+        }
+
+        .left-pane {
+            width: 20%;
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto;
+            background: #f8f9fa;
+            position: relative;
+            min-width: 200px;
+            max-width: 60%;
+            /* Prevent horizontal scroll, force truncation */
+            padding: 15px;
+            /* Flex properties to strict sizing */
+            flex: 0 0 auto;
+        }
+
+        /* Dedicated Resize Handle styling */
+        /* Dedicated Resize Handle styling */
+        .resize-handle {
+            width: 10px;
+            background-color: #f8f9fa;
+            border-left: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+            cursor: col-resize;
+            flex: 0 0 auto;
+            /* Fixed width */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            z-index: 20;
+            position: relative;
+        }
+
+        /* Grip visual (double vertical lines) */
+        .resize-handle::after {
+            content: "";
+            width: 4px;
+            height: 24px;
+            border-left: 2px solid #ccc;
+            border-right: 2px solid #ccc;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .resize-handle:hover,
+        .resize-handle.active {
+            background-color: #e2e6ea;
+        }
+
+        .resize-handle:hover::after,
+        .resize-handle.active::after {
+            border-color: #888;
+            opacity: 0.8;
+        }
+
+        .right-pane {
+            flex: 1;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: white;
+            min-width: 0;
+            /* Critical for flex child truncation */
+        }
+
+        .sticky-header-container {
+            flex-shrink: 0;
+            border-bottom: 1px solid #ddd;
+            background: white;
+            z-index: 10;
+        }
+
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            /* Reduced from 20px */
+            scroll-behavior: smooth;
+        }
+
+        /* Ensure table header sticks to top of scrollable content */
+        .field-table th {
+            text-align: left;
+            padding: 8px;
+            background: #f8f9fa;
+            /* Slightly darker than white for contrast */
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            /* Shadow to cover scrolling content */
+        }
+
+        .field-table {
+            width: 100%;
+            border-collapse: separate;
+            /* Required for sticky headers to work reliably with borders */
+            border-spacing: 0;
+        }
+
+        .detail-section-header {
+            padding: 15px 15px 10px 15px;
+            /* Reduced from 20px... */
+        }
+
+        .detail-section h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .legend-box {
+            margin: 0 20px 10px 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #495057;
+            font-size: 0.85em;
+        }
+
+        .validation-summary {
+            margin: 10px 20px;
+            padding: 12px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+        }
+
+        .tree-node {
+            margin-left: 0;
+            white-space: nowrap;
+        }
+
+        .tree-node:first-child {
+            margin-left: 0;
+        }
+
+        .group-header {
+            padding: 4px 8px;
+            margin: 1px 0;
+            cursor: pointer;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .group-header:hover {
+            background: #e9ecef;
+        }
+
+        .group-header.selected {
+            background: #495057;
+            color: white;
+        }
+
+        .group-toggle {
+            width: 12px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .badge {
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 0.7em;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .badge-full {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-teaser {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-enterprise {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-raw {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .validation-summary h4 {
+            margin-bottom: 8px;
+            color: #856404;
+        }
+
+        .warning-item {
+            padding: 8px;
+            margin: 4px 0;
+            background: #fffbdd;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .field-table th {
+            text-align: left;
+            padding: 8px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .legend-box {
+            position: sticky;
+            top: 50px;
+            z-index: 4;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #495057;
+            font-size: 0.85em;
+        }
+
+        .field-table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .field-table tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+
+        .field-table tr:hover {
+            background: #f2f2f2;
+        }
+
+        .field-value {
+            font-family: 'Courier New', monospace;
+            color: #0066cc;
+        }
+
+        .message-box {
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #0c5460;
+        }
+
+        .error,
+        .loading {
+            text-align: center;
+            padding: 30px;
+            margin: 15px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 6px;
+        }
+
+        .loading {
+            color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .panes-container {
+                flex-direction: column;
+            }
+
+            .left-pane {
+                width: 100%;
+                max-width: 100%;
+                height: 40%;
+                border-bottom: 2px solid #dee2e6;
+            }
+
+            .resize-handle {
+                display: none;
+            }
+        }
+
+        .privacy-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 12px;
+            font-size: 0.8em;
+            border-radius: 12px;
+            border: 1px solid #c8e6c9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            margin: 0 15px;
+        }
+
+        .privacy-badge strong {
+            font-weight: 600;
+        }
+
+        /* Hide text on very small screens if needed */
+        @media (max-width: 900px) {
+            .privacy-badge span.detail {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="dropArea">
+        <div class="header">
+            <div class="header-left">
+                <div style="display:flex; align-items:center; gap: 6px;">
+                    <!-- Scaled down GOAL3 Logo - Increased viewBox width to fix cut-off '3' -->
+                    <svg viewBox="0 0 98 24" height="18" width="74" xmlns="http://www.w3.org/2000/svg"
+                        style="display:block;">
+                        <text x="0" y="22" font-family="Arial, sans-serif" font-weight="900" font-style="italic"
+                            font-size="26" fill="#00ADD8" letter-spacing="-1">GOAL3</text>
+                    </svg>
+                    <!-- Version beside Logo -->
+                    <div class="version"
+                        style="font-size: 0.7em; color: #999; margin-left: 2px; align-self: flex-end; padding-bottom: 2px;">
+                        v<span id="wasm-version">Loading...</span></div>
+                </div>
+            </div>
+
+            <div class="privacy-badge" title="Data never leaves your browser">
+                <span>🛡️</span>
+                <strong>Zero Data Exfiltration</strong>
+                <span class="detail">&ndash; 100% Local</span>
+            </div>
+
+            <!-- Terms Link -->
+            <div style="margin-right: auto; margin-left: 15px;">
+                <a href="#" onclick="toggleEULAModal(); return false;"
+                    style="color: #666; text-decoration: none; border-bottom: 1px dashed #999;">Terms of Use</a>
+            </div>
+
+            <div class="header-controls">
+                <!-- Validation Badge -->
+                <button id="validationBadge" class="validation-badge" style="display: none;"
+                    onclick="toggleValidationModal()">
+                    <span>Loading...</span>
+                </button>
+                <span id="filenameDisplay" class="filename-display"></span>
+                <button class="file-select-btn" onclick="document.getElementById('fileInput').click()">Select / Drop AL3
+                    File</button>
+                <input type="file" id="fileInput" class="file-input" accept=".AL3,.al3">
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display:none;">⏳ Parsing AL3 file...</div>
+        <div id="error" class="error" style="display:none;"></div>
+
+        <!-- Validation Modal -->
+        <div id="validationModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Validation Summary</h3>
+                    <button class="close-btn" onclick="toggleValidationModal()">×</button>
+                </div>
+                <div id="modalBody" class="modal-body"></div>
+            </div>
+        </div>
+
+
+        <div id="content" class="content">
+            <div class="panes-container" style="display: flex; width: 100%; height: 100%; overflow: hidden;">
+                <div class="left-pane" id="treeView">
+                    <div
+                        style="color: #6c757d; font-style: italic; padding: 10px; text-align: center; margin-top: 20px;">
+                        No file loaded.
+                    </div>
+                </div>
+                <div class="resize-handle" id="dragMe"></div>
+                <div class="right-pane" id="detailView">
+                    <div class="message-box" style="margin: 20px;">
+                        Select or drop an AL3 file to view contents.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- EULA Modal -->
+    <div id="eulaModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Terms of Use <span id="eulaVersionDisplay"
+                        style="font-size: 0.7em; color: #666; font-weight: normal;"></span></h3>
+            </div>
+            <div class="modal-body" style="line-height: 1.4; color: #333;">
+                <p><strong>Copyright (c) 2025 Priya IO Systems</strong></p>
+                <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software (the
+                    "Software"), to use the Software, subject to the following conditions:</p>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li style="margin-bottom: 10px;"><strong>NO WARRANTY:</strong> THE SOFTWARE IS PROVIDED "AS IS",
+                        WITHOUT
+                        WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+                        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                        AUTHORS OR
+                        COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+                        CONTRACT,
+                        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+                        DEALINGS
+                        IN THE SOFTWARE.</li>
+                    <li style="margin-bottom: 10px;"><strong>Restriction:</strong> You may NOT reverse engineer,
+                        decompile,
+                        disassemble, or otherwise attempt to derive separate source code or algorithms from the compiled
+                        binary.
+                    </li>
+                </ul>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button onclick="acceptEULA()"
+                        style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">I
+                        Agree</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/wasm-viewer/wasm_exec.js"></script>
+    <script>
+        const CURRENT_EULA_VERSION = "1.0";
+        let wasmLoaded = false;
+
+        // Helper to escape HTML for safe display
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Modal Logic
+        function toggleValidationModal() {
+            const modal = document.getElementById('validationModal');
+            modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        // EULA Logic
+        function toggleEULAModal() {
+            const modal = document.getElementById('eulaModal');
+            modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+
+            // Update version display
+            const versionSpan = document.getElementById('eulaVersionDisplay');
+            if (versionSpan) {
+                versionSpan.textContent = `(v${CURRENT_EULA_VERSION})`;
+            }
+        }
+
+        function acceptEULA() {
+            localStorage.setItem('goal3_eula_version', CURRENT_EULA_VERSION);
+            // Clean up old boolean key if it exists
+            localStorage.removeItem('goal3_eula_accepted');
+            toggleEULAModal();
+        }
+
+        // Check EULA on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const acceptedVersion = localStorage.getItem('goal3_eula_version');
+            if (acceptedVersion !== CURRENT_EULA_VERSION) {
+                // Show EULA if version mismatch or not present
+                setTimeout(toggleEULAModal, 500); // Slight delay for smooth entrance
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('validationModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('validationModal')) {
+                toggleValidationModal();
+            }
+        });
+
+        document.getElementById('eulaModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('eulaModal')) {
+                toggleEULAModal();
+            }
+        });
+
+        // PII Masking Functions
+        function maskFormattedValue(refId, formattedValue) {
+            if (!formattedValue || formattedValue === '-') return formattedValue;
+
+            switch (refId) {
+                case 'SSNO':
+                    // "123-45-6789" → "***-**-6789"
+                    if (formattedValue.includes('-')) {
+                        return '***-**-' + formattedValue.slice(-4);
+                    }
+                    // Fallback for "123456789" format
+                    return '*****' + formattedValue.slice(-4);
+
+                case 'LICNO':
+                    // "DRV-LIC-25-CHARS" → "DRV-***-**-HARS"
+                    if (formattedValue.length > 7) {
+                        return formattedValue.slice(0, 3) + '-***-**-' + formattedValue.slice(-4);
+                    }
+                    return '*'.repeat(formattedValue.length - 4) + formattedValue.slice(-4);
+
+                case 'BIRDT':
+                case 'BIRTH':
+                    // "01/01/1980" → "**/**/1980"
+                    const yearMatch = formattedValue.match(/(\d{4})/);
+                    if (yearMatch) {
+                        return '**/**/' + yearMatch[1];
+                    }
+                    return formattedValue;
+
+                case 'EMAIL':
+                    // "john.doe@gmail.com" → "j***e@gmail.com"
+                    const emailMatch = formattedValue.match(/^(.)(.*)(.)@(.+)$/);
+                    if (emailMatch && emailMatch[2].length > 0) {
+                        return emailMatch[1] + '***' + emailMatch[3] + '@' + emailMatch[4];
+                    }
+                    // Fallback for short emails: "a@b.com" → "a***@b.com"
+                    if (formattedValue.includes('@')) {
+                        const parts = formattedValue.split('@');
+                        return parts[0].charAt(0) + '***@' + parts[1];
+                    }
+                    return formattedValue;
+
+                case 'PHONE':
+                    // "(555) 555-5550" → "(555) ***-5550"
+                    // Show area code + last 4
+                    const phoneMatch = formattedValue.match(/^(\([0-9]{3}\)|\d{3})(.*)(\d{4})$/);
+                    if (phoneMatch) {
+                        return phoneMatch[1] + ' ***-' + phoneMatch[3];
+                    }
+                    // Fallback: show last 4 only
+                    if (formattedValue.length > 4) {
+                        return '***-' + formattedValue.slice(-4);
+                    }
+                    return formattedValue;
+
+                case 'BKLOC':
+                case 'ANAME':
+                    // Bank account: show last 4
+                    if (formattedValue.length > 4) {
+                        return '****' + formattedValue.slice(-4);
+                    }
+                    return formattedValue;
+
+                default:
+                    return formattedValue;
+            }
+        }
+
+        function maskRawValue(refId, rawValue) {
+            if (!rawValue || rawValue === '-') return rawValue;
+
+            switch (refId) {
+                case 'SSNO':
+                    // "123456789" → "*****6789"
+                    return '*****' + rawValue.slice(-4);
+
+                case 'LICNO':
+                    // "DRVLIC25CHARSXXXXXXXX" → "DRV***************XXXX"
+                    if (rawValue.length > 7) {
+                        return rawValue.slice(0, 3) + '*'.repeat(rawValue.length - 7) + rawValue.slice(-4);
+                    }
+                    return rawValue;
+
+                case 'BIRDT':
+                case 'BIRTH':
+                    // "19800101" → "****1980" or "01/01/1980" → "****1980"
+                    const yearMatch = rawValue.match(/(\d{4})/);
+                    if (yearMatch) {
+                        return '****' + yearMatch[1];
+                    }
+                    return rawValue;
+
+                case 'EMAIL':
+                    // "johndoe@gmail.com" → "j******@gmail.com"
+                    if (rawValue.includes('@')) {
+                        const parts = rawValue.split('@');
+                        return parts[0].charAt(0) + '***@' + parts[1];
+                    }
+                    return rawValue;
+
+                case 'PHONE':
+                    // "(555) 555-5550" or "5555555550" → "******5550"
+                    // Extract just digits
+                    const digits = rawValue.replace(/\D/g, '');
+                    if (digits.length >= 4) {
+                        return '*'.repeat(digits.length - 4) + digits.slice(-4);
+                    }
+                    return rawValue;
+
+                case 'BKLOC':
+                case 'ANAME':
+                    if (rawValue.length > 4) {
+                        return '****' + rawValue.slice(-4);
+                    }
+                    return rawValue;
+
+                default:
+                    return rawValue;
+            }
+        }
+
+        function needsMasking(piiLevel) {
+            return piiLevel === 'critical' || piiLevel === 'partial';
+        }
+
+        function togglePII(button, event) {
+            event.stopPropagation();
+
+            const row = button.closest('tr');
+            const formattedSpan = row.querySelector('.pii-formatted');
+            const rawSpan = row.querySelector('.pii-raw');
+
+            const isCurrentlyMasked = button.dataset.masked !== 'false';
+            const refId = button.dataset.refId;
+            const originalFormatted = button.dataset.formatted;
+            const originalRaw = button.dataset.raw;
+
+            if (isCurrentlyMasked) {
+                // Confirm before revealing
+                if (!confirm('⚠️ WARNING: Revealing PII in both Formatted and Raw columns.\n\n' +
+                    'This data is sensitive and should be handled according to your organization\'s privacy policies.\n\n' +
+                    'Continue?')) {
+                    return;
+                }
+
+                // Reveal both columns
+                formattedSpan.textContent = originalFormatted;
+                rawSpan.textContent = originalRaw;
+                button.dataset.masked = 'false';
+                button.textContent = '🙈';
+                button.title = 'Hide PII in both columns';
+
+                // Highlight both cells
+                formattedSpan.style.backgroundColor = '#fff3cd';
+                rawSpan.style.backgroundColor = '#fff3cd';
+
+            } else {
+                // Re-mask both columns
+                formattedSpan.textContent = maskFormattedValue(refId, originalFormatted);
+                rawSpan.textContent = maskRawValue(refId, originalRaw);
+                button.dataset.masked = 'true';
+                button.textContent = '👁️';
+                button.title = 'Reveal PII in both formatted and raw columns';
+
+                // Remove highlight
+                formattedSpan.style.backgroundColor = 'transparent';
+                rawSpan.style.backgroundColor = 'transparent';
+            }
+        }
+
+
+        async function loadWASM() {
+            const go = new Go();
+            try {
+                const result = await WebAssembly.instantiateStreaming(fetch('/wasm-viewer/goal3_viewer_v1.0.0.213.wasm'), go.importObject);
+                go.run(result.instance);
+                await new Promise(resolve => {
+                    const check = setInterval(() => {
+                        if (window.wasmReady) { clearInterval(check); resolve(); }
+                    }, 100);
+                });
+                wasmLoaded = true;
+                // Add check to ensure getSegmentFields is available
+                if (!window.getSegmentFields) {
+                    console.error("WASM loaded but getSegmentFields not found!");
+                }
+                document.getElementById('wasm-version').textContent = window.getWASMVersion().version;
+
+                // Overrides are now compiled statically into the WASM binary.
+                // No need to fetch /api/config.
+
+            } catch (err) {
+                showError('Failed to load WASM: ' + err.message);
+            }
+        }
+
+        // Resizing Logic
+        const resizer = document.getElementById('dragMe');
+        const leftSide = document.getElementById('treeView');
+        const rightSide = document.getElementById('detailView');
+
+        let x = 0;
+        let leftWidth = 0;
+
+        const mouseDownHandler = function (e) {
+            x = e.clientX;
+            leftWidth = leftSide.getBoundingClientRect().width;
+
+            resizer.classList.add('active'); // Visual feedback
+
+            document.addEventListener('mousemove', mouseMoveHandler);
+            document.addEventListener('mouseup', mouseUpHandler);
+        };
+
+        const mouseMoveHandler = function (e) {
+            const dx = e.clientX - x;
+            const newCompWidth = ((leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
+
+            // Constrain width (15% to 70%)
+            if (newCompWidth > 15 && newCompWidth < 70) {
+                leftSide.style.width = `${newCompWidth}%`;
+            }
+
+            // Prevent selection during drag
+            e.preventDefault();
+        };
+
+        const mouseUpHandler = function () {
+            resizer.classList.remove('active');
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+        };
+
+        resizer.addEventListener('mousedown', mouseDownHandler);
+
+        // Global Drag & Drop Logic
+        const dropArea = document.getElementById('dropArea');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight drop area
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.querySelector('.header').classList.add('drag-active'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.querySelector('.header').classList.remove('drag-active'), false);
+        });
+
+        // Handle dropped files
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) handleFile(files[0]);
+        }
+
+        document.getElementById('fileInput').onchange = (e) => {
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
+        };
+
+        function showError(msg) {
+            const el = document.getElementById('error');
+            el.textContent = msg;
+            el.style.display = 'block';
+
+            // Clear processing state if error occurs
+            const detailView = document.getElementById('detailView');
+            if (detailView && detailView.innerHTML.includes('Processing File...')) {
+                detailView.innerHTML = `
+                    <div style="text-align:center; color:#721c24; margin-top:50px;">
+                        <h3 style="font-weight:400; margin:0;">Processing Failed</h3>
+                        <p style="margin-top:10px; font-size:0.9em; color:#666;">See error message above.</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function handleFile(file) {
+            if (!wasmLoaded || !window.parseAL3) {
+                showError('WASM not ready');
+                return;
+            }
+
+            // Update filename display
+            const nameDisplay = document.getElementById('filenameDisplay');
+            nameDisplay.textContent = file.name;
+            nameDisplay.style.display = 'inline-block';
+
+            // Validate file extension
+            if (!file.name.toLowerCase().endsWith('.al3')) {
+                showError('Invalid file format. The file does not appear to be a valid AL3 file (incorrect extension).');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+            const treeView = document.getElementById('treeView');
+            const detailView = document.getElementById('detailView');
+
+            loading.style.display = 'block';
+            errorDiv.style.display = 'none';
+            // Show content area immediately so it doesn't jump
+            document.getElementById('content').style.display = 'block';
+
+            // Clear previous state
+            treeView.innerHTML = '';
+            detailView.innerHTML = `
+                <div style="text-align:center; color:#6c757d; margin-top:50px;">
+                    <div style="font-size:3em; margin-bottom:15px; opacity:0.3;">⏳</div>
+                    <h3 style="font-weight:400; margin:0;">Processing File...</h3>
+                </div>
+            `;
+            document.getElementById('validationBadge').style.display = 'none';
+
+            // Allow UI to update
+            await new Promise(r => setTimeout(r, 50));
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                // WASM now returns a JSON string to avoid OOM
+                const jsonStr = window.parseAL3(new Uint8Array(arrayBuffer));
+
+                let result;
+                try {
+                    result = JSON.parse(jsonStr);
+                } catch (e) {
+                    showError("Failed to parse WASM response: " + e.message);
+                    return;
+                }
+
+                if (!result || result.error) {
+                    showError(result?.error || 'Parse failed');
+                    return;
+                }
+
+                // Store result globally for validation summary
+                window.lastParseResult = result;
+
+                // Parse Validation Summary and update badge
+                if (result.validation_summary) {
+                    const vs = result.validation_summary;
+                    const errCount = vs.error_count || 0;
+                    const warnCount = vs.warning_count || 0;
+                    const total = errCount + warnCount;
+
+                    const badge = document.getElementById('validationBadge');
+
+                    if (total > 0) {
+                        badge.style.display = 'flex';
+                        badge.className = 'validation-badge'; // Reset classes, use specific styling only
+
+                        // Build string: "🔴 156 Errors ⚠️ 4 Warnings"
+                        let badgeHtml = '';
+                        if (errCount > 0) {
+                            badgeHtml += `<span>🔴 ${errCount} Errors</span>`;
+                        }
+                        if (warnCount > 0) {
+                            badgeHtml += `<span>⚠️ ${warnCount} Warnings</span>`;
+                        }
+                        badge.innerHTML = badgeHtml;
+
+                        // Populate Modal
+                        let modalHtml = '';
+
+                        if (errCount > 0 && vs.errors && Array.isArray(vs.errors)) {
+                            modalHtml += `<h4 style="color:#dc3545; border-bottom:1px solid #eee; padding-bottom:5px;">🔴 Errors (${errCount})</h4>`;
+                            modalHtml += vs.errors.map(e => `
+                                <div class="warning-item" style="background:#f8d7da; border-left:3px solid #dc3545; padding:8px; margin-bottom:5px; font-size:0.9em;">
+                                    <strong>${e.name || 'Error'}</strong>: ${escapeHtml(e.message || '')}
+                                </div>
+                            `).join('');
+                        }
+
+                        if (warnCount > 0 && vs.warnings && Array.isArray(vs.warnings)) {
+                            modalHtml += `<h4 style="color:#856404; border-bottom:1px solid #eee; padding-bottom:5px; margin-top:20px;">⚠️ Warnings (${warnCount})</h4>`;
+                            modalHtml += vs.warnings.map(w => `
+                                <div class="warning-item" style="background:#fff3cd; border-left:3px solid #ffc107; padding:8px; margin-bottom:5px; font-size:0.9em;">
+                                    <strong>${w.name || 'Warning'}</strong>: ${escapeHtml(w.message || '')}
+                                </div>
+                            `).join('');
+                        }
+
+                        document.getElementById('modalBody').innerHTML = modalHtml;
+                    } else {
+                        badge.style.display = 'flex';
+                        badge.className = 'validation-badge success';
+                        badge.innerHTML = '✅ Valid File';
+                        document.getElementById('modalBody').innerHTML = '<div style="text-align:center; padding:40px; color:#28a745;"><h3>✅ No Validation Issues Found</h3><p>This file conforms to the parsed schema.</p></div>';
+                    }
+                } else {
+                    document.getElementById('validationBadge').style.display = 'none';
+                }
+
+                // Render Tree
+                // Note: displayTree uses result.hierarchy, make sure it matches WASM output
+                displayTree(result.hierarchy);
+
+                // Update Detail View Message with Success - Point Left (SVG Arrow)
+                detailView.innerHTML = `
+                    <div style="text-align:center; color:#6c757d; margin-top:50px;">
+                        <div style="opacity:0.3; margin-bottom:15px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="currentColor">
+                                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-weight:400; margin:0;">File Loaded Successfully</h3>
+                        <p style="margin-top:10px;">Select any group from the tree on the left to view its contents.</p>
+                    </div>
+                `;
+
+            } catch (err) {
+                showError('Error: ' + err.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayTree(hierarchy) {
+            const treeView = document.getElementById('treeView');
+            treeView.innerHTML = '';
+
+            if (!hierarchy || !Array.isArray(hierarchy)) {
+                console.error("displayTree received invalid hierarchy:", hierarchy);
+                // Don't crash, just show nothing or error in tree view
+                treeView.innerHTML = '<div style="padding:10px;color:red;">Error: Invalid hierarchy data</div>';
+                return;
+            }
+
+            // Each item in hierarchy is already a root node - don't nest them
+            hierarchy.forEach(node => {
+                treeView.appendChild(createTreeNode(node, 0));
+            });
+
+            document.getElementById('content').style.display = 'flex';
+        }
+
+        function createTreeNode(node, level, parentId = null) {
+            // Defensive validation
+            if (!node || typeof node !== 'object') {
+                console.error('Invalid node object:', node);
+                return document.createElement('div'); // Return empty div
+            }
+
+            const container = document.createElement('div');
+            container.className = 'tree-node';
+            container.dataset.id = node.id || ''; // Store ID for click/lazy loading
+
+            const header = document.createElement('div');
+            header.className = 'group-header';
+            header.style.marginLeft = (level * 20) + 'px';
+
+            const toggle = document.createElement('span');
+            toggle.className = 'group-toggle';
+
+            // LAZY LOAD LOGIC
+            // If has_children is true, show expander.
+            // If children array is present, it's already loaded (recursive case or pre-loaded).
+            const isExpandable = node.has_children || (node.children && Array.isArray(node.children) && node.children.length > 0);
+
+            toggle.textContent = isExpandable ? '▶' : '•'; // Use Bullet for leaf
+            if (!isExpandable) {
+                toggle.style.color = '#ccc';
+            } else {
+                toggle.style.cursor = 'pointer';
+                toggle.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleNode(node.id, container, level);
+                };
+            }
+
+            // Label Logic
+            let label = node.group_code;
+            if (node.level >= 5) {
+                // Formatting for data groups
+                label += '  ';
+                if (node.iteration) label += node.iteration;
+                else label += '    ';
+
+                if (node.processing_level && node.processing_level.trim()) {
+                    label += ' [' + node.processing_level + ']';
+                }
+            } else {
+                // Formatting for control groups
+                if (node.iteration) label += '  ' + node.iteration;
+            }
+
+            const code = document.createElement('span');
+            code.textContent = label;
+
+            header.appendChild(toggle);
+            header.appendChild(code);
+
+            // Detail Click Handler
+            header.onclick = (e) => {
+                // Deselect logic
+                document.querySelectorAll('.group-header').forEach(h => h.classList.remove('selected'));
+                header.classList.add('selected');
+                showNodeDetails(node);
+            };
+
+            container.appendChild(header);
+
+            // Container for children (initially hidden or empty)
+            const childrenContainer = document.createElement('div');
+            childrenContainer.className = 'children-container';
+            childrenContainer.style.display = 'none';
+            container.appendChild(childrenContainer);
+
+            return container;
+        }
+
+        async function toggleNode(nodeId, container, level) {
+            const childrenContainer = container.querySelector('.children-container');
+            const toggle = container.querySelector('.group-toggle');
+
+            if (childrenContainer.style.display === 'block') {
+                childrenContainer.style.display = 'none';
+                toggle.textContent = '▶';
+                return;
+            }
+
+            // If already loaded, just show
+            if (childrenContainer.hasChildNodes()) {
+                childrenContainer.style.display = 'block';
+                toggle.textContent = '▼';
+                return;
+            }
+
+            // Lazy load - check WASM availability
+            if (!window.getNodeChildren) {
+                console.error("getNodeChildren not available");
+                return;
+            }
+
+            const jsonStr = window.getNodeChildren(nodeId);
+            let children = [];
+            try {
+                children = JSON.parse(jsonStr);
+            } catch (e) {
+                console.error("Error parsing children", e);
+                toggle.textContent = '⚠️';
+                return;
+            }
+
+            if (children.error) {
+                console.error("Error fetching children", children.error);
+                return;
+            }
+
+            // Populate children
+            children.forEach(child => {
+                childrenContainer.appendChild(createTreeNode(child, level + 1));
+            });
+
+            childrenContainer.style.display = 'block';
+            toggle.textContent = '▼';
+        }
+
+        function showNodeDetails(node) {
+            const detailView = document.getElementById('detailView');
+
+            // Should now call getSegmentFields(id)
+            if (!node.id) {
+                // Should not happen with new backend
+                detailView.innerHTML = `<div class="error">Error: Node ID missing. Recompile WASM.</div>`;
+                return;
+            }
+
+            // Fetch fields from Lazy Registry
+            // WASM now returns a JSON string
+            const jsonStr = window.getSegmentFields(node.id); // CALLING NEW API
+            let result;
+            try {
+                result = JSON.parse(jsonStr);
+            } catch (e) {
+                console.error("Lazy load parse error", e);
+                detailView.innerHTML = `<div class="error">Parse error loading fields</div>`;
+                return;
+            }
+
+            if (result.error) {
+                detailView.innerHTML = `<div class="error">${result.error}</div>`;
+                return;
+            }
+
+            const fields = result.fields || [];
+            // Use raw_data_hex from API result (lazy loaded), fallback to node (legacy check)
+            const rawHex = result.raw_data_hex || node.raw_data_hex || "";
+
+            let html = `
+                <div class="detail-section-header">
+                    <h3>${node.group_name || node.group_code} (${fields.length} Data Elements)</h3>
+                </div>
+            `;
+
+            // If we have fields from lazy load
+            if (fields.length > 0) {
+                html += `
+                    <div class="scrollable-content">
+                        <table class="field-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">ID</th>
+                                    <th style="width: 80px;">Ref ID</th>
+                                    <th style="width: 120px;">Key</th>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                    <th>Raw</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                fields.forEach(f => {
+                    // Defensive validation of field object
+                    if (!f || typeof f !== 'object') return;
+
+                    // Get original values
+                    // Get display value (prefer formatted, fallback to raw typed value)
+                    let valDisplay = f.formatted_value || f.value;
+                    if (valDisplay === null || valDisplay === undefined) valDisplay = '';
+                    if (valDisplay === null || valDisplay === undefined) valDisplay = '';
+                    const originalFormatted = String(valDisplay);
+                    const originalRaw = f.raw_value || '';
+
+                    // Check if field needs masking
+                    const isMasked = needsMasking(f.pii_level);
+
+                    // Apply masking if needed
+                    let displayFormatted = originalFormatted;
+                    let displayRaw = originalRaw;
+
+                    if (isMasked && originalFormatted) {
+                        displayFormatted = maskFormattedValue(f.ref_id, originalFormatted);
+                        displayRaw = maskRawValue(f.ref_id, originalRaw);
+                    }
+
+                    // Escape HTML
+                    const escapedFormatted = escapeHtml(displayFormatted);
+                    const escapedRaw = escapeHtml(displayRaw);
+
+                    // Create toggle button for PII fields
+                    const toggleBtn = isMasked
+                        ? ` <button class="toggle-pii" 
+                                data-ref-id="${f.ref_id}" 
+                                data-formatted="${escapeHtml(originalFormatted)}" 
+                                data-raw="${escapeHtml(originalRaw)}"
+                                data-masked="true"
+                                onclick="togglePII(this, event)" 
+                                title="Reveal PII in both formatted and raw columns" 
+                                style="margin-left:8px; cursor:pointer; border:none; background:none; font-size:1.1em; vertical-align:middle; padding:0;">
+                            👁️
+                           </button>`
+                        : '';
+
+                    html += `
+                        <tr>
+                            <td>${f.id || ''}</td>
+                            <td>${f.ref_id || '-'}</td>
+                            <td><span style="font-family:monospace;color:#666;">${escapeHtml(f.key || '')}</span></td>
+                            <td>${escapeHtml(f.name || '')}</td>
+                            <td class="field-value"><span class="pii-formatted">${escapedFormatted}</span>${toggleBtn}</td>
+                            <td style="font-family:monospace;color:#888;"><span class="pii-raw">${escapedRaw}</span></td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table></div>`;
+            } else if (rawHex) {
+                // Fallback for raw nodes
+                html += `
+                    <div class="message-box" style="margin:20px;">
+                        Schema definition not found for this group. Showing raw hex data.
+                    </div>
+                    <div class="scrollable-content">
+                         <div style="font-family:monospace;word-break:break-all;background:#f8f9fa;padding:15px;color:#555;">
+                            ${rawHex}
+                         </div>
+                    </div>
+                 `;
+            } else {
+                html += `<div class="message-box" style="margin:20px;">No fields found.</div>`;
+            }
+
+            detailView.innerHTML = html;
+        }
+
+
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        loadWASM();
+    </script>
+</body>
+
+</html>

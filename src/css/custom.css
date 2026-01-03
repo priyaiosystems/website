@@ -1,0 +1,344 @@
+/**
+ * CSS variables for professional enterprise theme
+ * Color scheme: Professional grays with accent colors from logo
+ */
+
+/* Override Docusaurus CSS variables */
+:root {
+  /* Primary brand colors - professional grays and blues */
+  --ifm-color-primary: #4a5568;
+  --ifm-color-primary-dark: #3d4555;
+  --ifm-color-primary-darker: #373f4e;
+  --ifm-color-primary-darkest: #2d3748;
+  --ifm-color-primary-light: #5a6a7f;
+  --ifm-color-primary-lighter: #667790;
+  --ifm-color-primary-lightest: #718096;
+
+  /* Accent color from logo (teal/cyan) */
+  --ifm-color-secondary: #00ADD8;
+  --ifm-color-secondary-dark: #009ac2;
+  --ifm-color-secondary-darker: #0091b7;
+  --ifm-color-secondary-darkest: #007796;
+  --ifm-color-secondary-light: #1ab8e0;
+  --ifm-color-secondary-lighter: #2ebfe4;
+  --ifm-color-secondary-lightest: #56cde9;
+
+  /* Professional grays */
+  --ifm-color-gray-0: #ffffff;
+  --ifm-color-gray-100: #f7fafc;
+  --ifm-color-gray-200: #edf2f7;
+  --ifm-color-gray-300: #e2e8f0;
+  --ifm-color-gray-400: #cbd5e0;
+  --ifm-color-gray-500: #a0aec0;
+  --ifm-color-gray-600: #718096;
+  --ifm-color-gray-700: #4a5568;
+  --ifm-color-gray-800: #2d3748;
+  --ifm-color-gray-900: #1a202c;
+
+  /* Enterprise trust colors */
+  --ifm-color-success: #48bb78;
+  --ifm-color-info: #4299e1;
+  --ifm-color-warning: #ed8936;
+  --ifm-color-danger: #f56565;
+
+  /* Typography */
+  --ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --ifm-font-family-monospace: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+
+  --ifm-code-font-size: 90%;
+  --ifm-heading-font-weight: 600;
+
+  /* Spacing and layout */
+  --ifm-navbar-height: 50px;
+  --ifm-footer-background-color: var(--ifm-color-gray-900);
+  --ifm-footer-color: var(--ifm-color-gray-300);
+  --ifm-footer-link-color: var(--ifm-color-gray-200);
+  --ifm-footer-title-color: var(--ifm-color-gray-100);
+}
+
+/* Dark mode overrides removed - Light theme only */
+
+/* Hero banner styling */
+.hero--primary {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  background-size: cover;
+  padding: 4rem 2rem;
+}
+
+.hero__title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.hero__subtitle {
+  font-weight: 400;
+  opacity: 0.95;
+}
+
+/* Button customizations */
+.button--secondary {
+  background-color: var(--ifm-color-secondary);
+  border-color: var(--ifm-color-secondary);
+  color: #fff;
+}
+
+.button--secondary:hover {
+  background-color: var(--ifm-color-secondary-dark);
+  border-color: var(--ifm-color-secondary-dark);
+}
+
+.button--warning {
+  background-color: var(--ifm-color-warning);
+  border-color: var(--ifm-color-warning);
+  color: #fff;
+}
+
+.button--warning:hover {
+  background-color: #dd6b20;
+  border-color: #dd6b20;
+}
+
+/* Navbar customizations */
+.navbar {
+  background-color: var(--ifm-color-gray-0);
+  border-bottom: 1px solid var(--ifm-color-gray-200);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.navbar__title {
+  color: #718096;
+}
+
+.navbar__link--active {
+  color: var(--ifm-color-secondary);
+  font-weight: 600;
+}
+
+/* Force hide theme toggle if config doesn't catch it */
+.navbar__items .react-toggle,
+button[class*="colorModeToggle"],
+button[aria-label*="Switch between dark and light mode"],
+button[title*="Switch between dark and light mode"] {
+  display: none !important;
+}
+
+/* Card-like sections */
+.margin-vert--xl {
+  border-radius: 12px;
+}
+
+/* Code blocks */
+.prism-code {
+  border-radius: 8px;
+}
+
+/* Links */
+a {
+  color: var(--ifm-color-secondary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ifm-color-secondary-dark);
+  text-decoration: underline;
+}
+
+/* Force right items to the edge */
+.navbar__items--right {
+  padding-right: 0 !important;
+}
+
+/* Remove margin from the last item on the right (Contact Sales) */
+.navbar__items--right> :last-child {
+  margin-right: -10px !important;
+  /* Pull it slightly to compensate for container padding */
+}
+
+/* Table of contents */
+.table-of-contents {
+  font-size: 0.875rem;
+}
+
+.table-of-contents__link--active {
+  color: var(--ifm-color-secondary);
+  font-weight: 600;
+}
+
+/* Admonitions (info boxes) */
+.admonition {
+  border-radius: 8px;
+}
+
+.admonition-icon svg {
+  fill: currentColor;
+}
+
+/* Make the AWS Marketplace CTA stand out */
+.aws-marketplace-cta {
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background-color: var(--ifm-color-warning);
+  color: #fff !important;
+  transition: all 0.2s ease;
+}
+
+.aws-marketplace-cta:hover {
+  background-color: #dd6b20;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Navbar CTA Button (Launch Viewer) */
+.navbar-cta-btn {
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+/* Improve readability */
+.markdown p {
+  line-height: 1.7;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* Footer links */
+.footer__link-item {
+  color: var(--ifm-footer-link-color);
+}
+
+.footer__link-item:hover {
+  color: var(--ifm-color-secondary-lighter);
+  text-decoration: none;
+}
+
+/* Professional shadows */
+.card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 996px) {
+  .hero--primary {
+    padding: 3rem 1rem;
+  }
+
+  .hero__title {
+    font-size: 2.5rem;
+  }
+}
+
+/* Comparison Table Styling */
+/* Comparison Table Styling */
+.comparison-table-container {
+  overflow-x: auto;
+  border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  margin: 3rem auto;
+  background: white;
+  max-width: 1000px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  /* Allows for cleaner border handling */
+  border-spacing: 0;
+  font-family: inherit;
+  min-width: 600px;
+}
+
+.comparison-table th {
+  background: #f8fafc;
+  padding: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.comparison-table td {
+  padding: 1.5rem;
+  font-size: 1rem;
+  color: #475569;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Feature Column - Left Aligned */
+.comparison-table th:first-child,
+.comparison-table td:first-child {
+  text-align: left;
+  width: 30%;
+  font-weight: 600;
+  color: #1e293b;
+  border-right: 1px solid #f1f5f9;
+  /* Subtle separator */
+}
+
+/* Product Columns - Center Aligned */
+.comparison-table th:not(:first-child),
+.comparison-table td:not(:first-child) {
+  text-align: center;
+  width: 35%;
+}
+
+/* Web Viewer Header */
+.product-column-free {
+  color: #00ADD8 !important;
+  /* Brand Blue */
+}
+
+/* Enterprise Header */
+.product-column-pro {
+  color: #2e8555 !important;
+  /* Brand Green */
+  background: #f0fdf4 !important;
+  /* Very subtle green tint */
+  border-bottom: 2px solid #2e8555 !important;
+  /* Accent underline */
+}
+
+/* Enterprise Column Cells */
+.comparison-table td:nth-child(3) {
+  background: #fcfdff;
+  /* Extremely subtle distinction */
+  font-weight: 500;
+  color: #0f172a;
+}
+
+/* Highlight specific cells */
+.highlight-cell {
+  font-weight: 700 !important;
+  color: #166534 !important;
+  /* Darker green */
+}
+
+/* Hover Effects */
+.comparison-table tbody tr:hover td {
+  background-color: #f8fafc;
+}
+
+.comparison-table tbody tr:hover td:nth-child(3) {
+  background-color: #f0fdf4;
+  /* Maintain green tint on hover */
+}
